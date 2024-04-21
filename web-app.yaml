@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-database
+  labels:
+    app.kubernetes.io/name: redis-database
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: redis-database
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: redis-database
+    spec:
+      containers:
+      - name: redis-database
+        image: docker.io/shayyo/web-application-redis:latest
+        imagePullPolicy: Always
+        command: ['/usr/local/bin/entrypoint.sh']
+        env:
+        - name: MASTER
+          value: "true"
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+        - mountPath: /redis-master
+          name: config
+      volumes:
+      - name: data
+        emptyDir: {}
+      - name: config
+        configMap:
+          name: example-redis-config
+          items:
+          - key: redis-config 
+            path: redis.conf
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python-app-flask
+  labels:
+    app.kubernetes.io/name: python-flask
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: python-flask
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: python-flask
+    spec:
+      containers:
+      - name: python-flask
+        image: docker.io/shayyo/web-application-flask:latest
+        imagePullPolicy: Always
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-service
+spec:
+  selector:
+    app.kubernetes.io/name: MyApp
+  ports:
+    - protocol: TCP
+      port: 6379
+      targetPort: 6379
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-redis-config
+data:
+  redis-config: |
+    protected-mode no
+    daemonize yes
