@@ -6,7 +6,7 @@ from flask import Flask
 app = Flask(__name__)
 res = redis.StrictRedis(host='redis-service', port=6379)
 
-def get_currency_data(date_string):
+def get_currency_data():
     retries = 5
     while True:
         try:
