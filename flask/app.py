@@ -20,3 +20,9 @@ def get_currency_data():
 def hello():
     count = get_currency_data()
     return 'Your currency data is {} times.\n'.format(count)
+
+
+@app.route('/counter')
+def index():
+    redis.incr('hits')
+    return 'This page has been visited {} times.'.format(redis.get('hits'))
