@@ -24,4 +24,4 @@ def get_currency_data(date_string):
 @app.route('/<regex("[0-9]{4}-[0-9]{2}-[0-9]{2}"):date_string>')
 def hello():
     currency_results = get_currency_data(date_string)
-    return f'Your currency data is {}.\n'.(currency_results)
+    return f"Your currency data is {currency_results}"
